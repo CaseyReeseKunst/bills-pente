@@ -1,0 +1,82 @@
+.\" I really don't like to write man pages.
+.ds ]W Pente 2.2.4
+.TH Pente 6 "31 July 2001"
+.SH NAME
+pente \- Game of five in a row
+.SH SYNOPSIS
+.LP
+.B pente -help
+.LP
+.B pente
+[
+.I <options>
+]
+.SH HOW TO PLAY PENTE
+Pente is the American name of a Japanese game called ``ni-nuki'',
+which is a variant of the ancient game ``go-moku''.  Pente is played
+on a 19x19 grid with stones of two different colors. 
+Each player chooses one set of stones; then the players take turns
+placing their stones on any unoccupied intersection until one player
+wins.
+.LP
+There are two ways to win.  If a player makes five
+or more stones in a straight line (across, down, or diagonally), then
+that player wins.  Or, if a player captures five pairs of his or her
+opponent's stones, that player also wins.
+.LP
+Stones may be captured in pairs only.  To capture
+a pair of stones, a player must place one stone on either side of the
+pair.
+.LP
+The first move is placed in the center of the board.  To make up for the
+advantage of going first, the first player's second move must be at least
+three spaces from their first.  This sounds confusing, so don't worry
+about it; just play, and if the computer won't let you move where you
+want on your second move, play somewhere farther away.
+.LP
+That's it!  These directions are pretty terse, but if you have an X display
+there are better directions available through the ``help'' button.  You can
+also try playing a few games; the rules are simple enough that you can pick
+them up easily just by playing.
+.SH THE PROGRAM
+This program has support for many different display types.  Depending on
+the compile options used, X Windows, Curses, and a plain text format
+may be available.  The exact display type used will be chosen by the program,
+or it may be selected with a command line switch.  Information on the
+switches is available with
+.B pente
+.BR \-help .
+.LP
+Most of the command line switches can also be set with the ``setup'' window
+of the X interface.  Any changes you make there will be saved in the
+.B .pente.ad
+file and remembered the next time that you play.
+.LP
+The command line switches can also be set with an X default.  For example,
+if you want to set black and white to be the default mode, you can run pente
+with 
+.B pente
+.BR -nocolor ,
+or you can add 
+.B pente*color: 0
+to your X defaults, or you can just turn off color in the ``setup'' window.
+.LP
+Pente will store a new
+.B .pente.ad
+file every time you run it.  In this file it will save the current state of
+Pente.  This is handy; you don't normally have to set command line switches
+since Pente will remember them in the
+.B .pente.ad
+file.
+.SH BUGS
+Sometimes the
+.B .pente.ad
+file gets some bad data in it.  Just delete the file and then
+you can start from scratch again.
+.SH AUTHOR
+Bill Shubert (wms@igoweb.org)
+.LP
+French text by Eric Dupas (dupas@univ-mlv.fr)
+.LP
+Italian text by Andrea Borgia (email: borgia@cs.unibo.it; homepage:
+http://www.cs.unibo.it/~borgia)
