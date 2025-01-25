@@ -1,0 +1,383 @@
+AC_INIT
+
+#
+# $Source: /home/wms/cvs/pente/configure.in,v $
+# $Revision: 1.6 $
+# $Date: 2001/08/01 00:01:45 $
+#
+# Remember to change these in "README", and "pente.6" too.
+# DATE must be in DAY MONTH YEAR format.
+
+date="31 7 2001"
+VERSION=\"2.2.5\"
+
+######################################################################
+# My own, personal functions.                                        #
+######################################################################
+AC_DEFUN(WMS_GET_SYSTEM,
+[AC_MSG_CHECKING([for machine type])
+if test ${target} = NONE ; then
+  SYSTEM_TYPE=`uname -m | sed sx/xxg`
+  if test $? '!=' 0 ; then SYSTEM_TYPE=unknown ; fi
+  os=`uname -s | sed sx/xxg`
+  if test $? '=' 0 ; then SYSTEM_TYPE=${SYSTEM_TYPE}-${os} ; fi
+  if test ${os} '=' SunOS ; then
+    SYSTEM_TYPE=${SYSTEM_TYPE}`uname -r | sed -e 's/\.//g' -e 's/_.*//'`
+  fi
+  AC_MSG_RESULT($SYSTEM_TYPE)
+else
+  SYSTEM_TYPE=${target}
+  AC_MSG_RESULT($SYSTEM_TYPE (set by user))
+fi])
+
+AC_DEFUN(WMS_GET_CFLAGS,
+[AC_MSG_CHECKING([for best CFLAGS argument])
+if test $ac_cv_prog_gcc = yes ; then
+  CFLAGS='-O2 -fomit-frame-pointer'
+else
+  CFLAGS='-O'
+fi
+AC_MSG_RESULT($CFLAGS)
+AC_SUBST(CFLAGS)])
+
+AC_DEFUN(WMS_CHECK_H_ERRNO,
+[AC_MSG_CHECKING([for h_errno])
+AC_TRY_LINK([#include <sys/types.h>
+#include <sys/socket.h>
+#if  HAVE_NETINET_IN_H
+#include <netinet/in.h>
+#endif
+#if  HAVE_SYS_IN_H
+#include <sys/in.h>
+#endif
+#if  HAVE_SYS_INET_H
+#include <sys/inet.h>
+#endif
+#include <netdb.h>
+#if  HAVE_ARPA_NAMESER_H
+#include <arpa/nameser.h>
+#endif
+#if  HAVE_RESOLV_H
+#include <resolv.h>
+#endif], [h_errno = 0;],
+  [AC_MSG_RESULT(yes); AC_DEFINE(HAVE_H_ERRNO)], [AC_MSG_RESULT(no)])])
+
+# I don't really know what will clearly tell whether you have sockets or not,
+#   so I just took a bunch of socket-related functions and stuck them in
+#   a routine.  If it builds and links, I assume I can build sockets code;
+#   otherwise I assume I can't.
+AC_DEFUN(WMS_CHECK_SOCKETS,
+[AC_MSG_CHECKING([for sockets])
+AC_TRY_LINK([#include <sys/types.h>
+#include <sys/socket.h>
+#if  HAVE_NETINET_IN_H
+#include <netinet/in.h>
+#endif
+#if  HAVE_SYS_IN_H
+#include <sys/in.h>
+#endif
+#if  HAVE_SYS_INET_H
+#include <sys/inet.h>
+#endif
+#include <netdb.h>
+#if  HAVE_ARPA_NAMESER_H
+#include <arpa/nameser.h>
+#endif
+#if  HAVE_RESOLV_H
+#include <resolv.h>
+#endif
+#include <sys/utsname.h>
+#include <pwd.h>
+#include <fcntl.h>], [
+struct sockaddr_in sa;
+bind(0,(struct sockaddr *)&sa, sizeof(sa));
+listen(0,2);
+socket(AF_INET,SOCK_STREAM,0);
+gethostbyname("foo");],
+  [AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SOCKETS)], [AC_MSG_RESULT(no)])])
+
+######################################################################
+# Done with my own functions.  On to the real configure file.        #
+######################################################################
+
+export VERSION
+AC_DEFINE_UNQUOTED(VERSION,$VERSION)
+
+dayNum=`echo $date | awk '{ print $1 }'`
+monthNum=`echo $date | awk '{ print $2 }'`
+yearNum=`echo $date | awk '{ print $3 }'`
+monthEnglish=`echo January February March April May June July August September October November December | awk '{ print $'$monthNum' }'`
+monthFrench=`echo Janvier Fevrier Mars Avril Mai Juin Juillet Août Septembre Octobre Novembre Décembre | awk '{ print $'$monthNum' }'`
+monthItalian=`echo Gennaio Febbraio Marzo Aprile Maggie Guigno Luglio Agosto Settembre Ottobre Novembre Dicembre | awk '{ print $'$monthNum' }'`
+DATE="\"$dayNum $monthEnglish $yearNum\""
+DATE_FRENCH="\"$dayNum $monthFrench $yearNum\""
+DATE_ITALIAN="\"$dayNum $monthItalian $yearNum\""
+export DATE
+export DATE_FRENCH
+export DATE_ITALIAN
+AC_DEFINE_UNQUOTED(DATE,$DATE)
+AC_DEFINE_UNQUOTED(DATE_FRENCH,$DATE_FRENCH)
+AC_DEFINE_UNQUOTED(DATE_ITALIAN,$DATE_ITALIAN)
+
+AC_PROG_INSTALL
+AC_PROG_CC
+AC_PROG_CPP
+WMS_GET_CFLAGS
+
+PROGS="pente"
+AC_SUBST(PROGS)dnl
+BUILD_DIR=`pwd`
+AC_SUBST(BUILD_DIR)dnl
+LIBDIR="-L\$(BUILD_DIR)/wmslib"
+INCDIR="-I\$(BUILD_DIR)/wmslib/src -I\$(BUILD_DIR)/obj-\$(SYSTEM_TYPE)"
+WMS_GET_SYSTEM
+export SYSTEM_TYPE
+AC_SUBST(SYSTEM_TYPE)dnl
+rm -rf obj-${SYSTEM_TYPE} obj-d${SYSTEM_TYPE} pente-${SYSTEM_TYPE}
+mkdir obj-${SYSTEM_TYPE}
+if test x"$HOME" = x/home/wms ; then
+  mkdir obj-d${SYSTEM_TYPE}
+fi
+
+cp configure.h.in obj-${SYSTEM_TYPE}/configure.h.in
+AC_CONFIG_HEADER(obj-${SYSTEM_TYPE}/configure.h)
+AC_SUBST(LIBS)dnl
+AC_SUBST(LIBDIR)dnl
+AC_SUBST(INCDIR)dnl
+AC_SUBST(VERSION)dnl
+AC_SUBST(DATE)dnl
+AC_PROG_RANLIB
+AC_ISC_POSIX
+AC_MINIX
+AC_AIX
+AC_CHECK_LIB(m,main)
+AC_CHECK_LIB(seq,main)
+AC_CHECK_LIB(nsl,main)
+AC_CHECK_LIB(socket,main)
+AC_CHECK_HEADER(curses.h,
+  AC_CHECK_LIB(curses, main,
+    AC_DEFINE(CURSES_DISP)
+    AC_CHECK_LIB(termcap, main)
+    LIBS="-lcurses $LIBS"))
+AC_STDC_HEADERS
+AC_CHECK_HEADERS(memory.h sys/select.h unistd.h assert.h stdlib.h string.h netinet/in.h sys/in.h sys/inet.h arpa/nameser.h resolv.h sys/time.h)
+AC_TIME_WITH_SYS_TIME
+AC_CHECK_HEADER(
+  sun/audioio.h,
+  AC_DEFINE(SUN_SOUND),
+  AC_CHECK_HEADER(
+    machine/soundcard.h,
+    AC_DEFINE(LINUX_SOUND)))	
+WMS_CHECK_H_ERRNO
+WMS_CHECK_SOCKETS
+if test "$cross_compiling" = "yes" ; then
+  echo "********* IMPORTANT *************************************************"
+  echo "*** It looks like either you are cross compiling, or configure cannot"
+  echo "***   figure out how to run your C compiler."
+  echo "*** If you are cross compiling, then configure cannot detect the "
+  echo "***   size of various types and the endian style of your machine.  "
+  echo "***   You will have to edit the file obj-${SYSTEM_TYPE}/configure.h "
+  echo "***   by hand."
+  echo "*** If you are NOT cross compiling, then please see the README file"
+  echo "***   for instructions on how to tell ./configure how to run your"
+  echo "***   C compiler."
+  echo "*********************************************************************"
+else
+  AC_CHECK_SIZEOF(short)
+  if test "x$ac_cv_sizeof_short" '=' x0 ; then
+    echo "********* IMPORTANT *************************************************"
+    echo "*** configure cannot figure out how to run your C compiler."
+    echo "***   figure out how to run your C compiler."
+    echo "*** If you are cross compiling, then configure cannot detect the "
+    echo "***   size of various types and the endian style of your machine.  "
+    echo "***   You will have to edit the file obj-${SYSTEM_TYPE}/configure.h "
+    echo "***   by hand."
+    echo "*** If you are NOT cross compiling, then please see the README file"
+    echo "***   for instructions on how to tell ./configure how to run your"
+    echo "***   C compiler."
+    echo "*********************************************************************"
+    exit 1
+  fi
+  AC_CHECK_SIZEOF(int)
+  AC_CHECK_SIZEOF(long)
+  AC_CHECK_SIZEOF(long long)
+  AC_C_BIGENDIAN
+fi
+AC_CHECK_FUNCS(strerror getdtablesize memmove strcasecmp)
+AC_RETSIGTYPE
+AC_FIND_X
+if test '!' "$no_x" ; then
+  AC_DEFINE(X11_DISP)
+  if test "$x_includes" ; then
+    INCDIR="$INCDIR -I$x_includes"
+  fi
+  LIBS="-lX11 $LIBS"
+  if test "$x_libraries" ; then
+    LIBDIR="$LIBDIR -L$x_libraries"
+  fi
+fi
+
+subdirs='comp xio'
+for dname in ${subdirs}; do
+  mkdir obj-${SYSTEM_TYPE}/$dname
+  if test x"$HOME" = x/home/wms ; then
+    mkdir obj-d${SYSTEM_TYPE}/$dname
+  fi
+done
+
+TOP_FILES='pente pe_snd play board cio textio'
+PENTE_INCS='src/pente.h src/play.h src/board.h src/comp/comp.h src/comp/eval.h src/xio/xio.h src/xio/setup.h src/xio/helpwin.h src/xio/sound.h src/xio/remAcc.h'
+
+COMP_FILES='comp spawn eval move lmove deeptree'
+
+XIO_FILES='plasma xio mainwin helpwin strings pentebuts cm2pm setup remote sound remAcc'
+
+ofiles=' '
+sfiles="README COPYING man6/pente.6 configure Makefile.in configure.h.in install-sh $PENTE_INCS"
+for ofile in ${TOP_FILES}; do
+  ofiles="${ofiles} obj-\$(SYSTEM_TYPE)/${ofile}.o"
+  sfiles="${sfiles} src/${ofile}.c"
+done
+for ofile in ${COMP_FILES}; do
+  ofiles="${ofiles} obj-\$(SYSTEM_TYPE)/comp/${ofile}.o"
+  sfiles="${sfiles} src/comp/${ofile}.c"
+done
+for ofile in ${XIO_FILES}; do
+  ofiles="${ofiles} obj-\$(SYSTEM_TYPE)/xio/${ofile}.o"
+  sfiles="${sfiles} src/xio/${ofile}.c"
+done
+
+OBJS=${ofiles}
+AC_SUBST(OBJS)dnl
+AC_OUTPUT(Makefile)
+
+for ofile in ${TOP_FILES}; do
+  cat <<EOF >>Makefile
+obj-\$(SYSTEM_TYPE)/${ofile}.o:	src/${ofile}.c
+	cd src; \$(CC) \$(CFLAGS) -c ${ofile}.c
+	mv src/${ofile}.o obj-\$(SYSTEM_TYPE)/${ofile}.o
+
+EOF
+done
+
+for ofile in ${COMP_FILES}; do
+  cat <<EOF >>Makefile
+obj-\$(SYSTEM_TYPE)/comp/${ofile}.o:	src/comp/${ofile}.c
+	cd src/comp; \$(CC) \$(CFLAGS) -c ${ofile}.c
+	mv src/comp/${ofile}.o obj-\$(SYSTEM_TYPE)/comp/${ofile}.o
+
+EOF
+done
+
+for ofile in ${XIO_FILES}; do
+  cat <<EOF >>Makefile
+obj-\$(SYSTEM_TYPE)/xio/${ofile}.o:	src/xio/${ofile}.c
+	cd src/xio; \$(CC) \$(CFLAGS) -c ${ofile}.c
+	mv src/xio/${ofile}.o obj-\$(SYSTEM_TYPE)/xio/${ofile}.o
+
+EOF
+done
+
+# I blow away the cache every time.  Why?  Here's why:
+#   A) You hopefully only ever run configure once per machine type, so
+#      it won't buy most users any time.
+#   B) If you have several machine types sharing a file system, the cache will
+#      make configure break!  There's NO CHECK to make sure that the cache is
+#      for the appropriate machine!
+# These two reasons - especially B - lead me to conclude that autoconf's
+#   caching is not useful in it's current implementation.  If code is added
+#   to make it check to ensure that it's on the right machine, great, otherwise
+#   forget it.
+echo Destroying config.cache
+rm -f config.cache
+
+# Add in wmslib's Makefile
+
+TOP_FILES='wms'
+WMS_FILES='clp clp-x rnd snd str'
+BUT_FILES='net box but canvas checkbox ctext i_finder i_general i_snd i_win menu menu_snd plain rcur slide tblock text textin timer write'
+ABUT_FILES='abut swin msg'
+
+cfiles=' '
+hfiles=' '
+ofiles=' '
+for tfile in ${TOP_FILES}; do
+  cfiles="${cfiles} wmslib/src/${tfile}.c"
+  hfiles="${hfiles} wmslib/src/${tfile}.h"
+  ofiles="${ofiles} wmslib/obj-\$(SYSTEM_TYPE)/${tfile}.o"
+done
+for tfile in ${WMS_FILES}; do
+  cfiles="${cfiles} wmslib/src/wms/${tfile}.c"
+  hfiles="${hfiles} wmslib/src/wms/${tfile}.h"
+  ofiles="${ofiles} wmslib/obj-\$(SYSTEM_TYPE)/wms_${tfile}.o"
+done
+for tfile in ${BUT_FILES}; do
+  cfiles="${cfiles} wmslib/src/but/${tfile}.c"
+  hfiles="${hfiles} wmslib/src/but/${tfile}.h"
+  ofiles="${ofiles} wmslib/obj-\$(SYSTEM_TYPE)/but_${tfile}.o"
+done
+for tfile in ${ABUT_FILES}; do
+  cfiles="${cfiles} wmslib/src/abut/${tfile}.c"
+  hfiles="${hfiles} wmslib/src/abut/${tfile}.h"
+  ofiles="${ofiles} wmslib/obj-\$(SYSTEM_TYPE)/abut_${tfile}.o"
+done
+
+sfiles="${sfiles} ${cfiles} ${hfiles}"
+
+rm -rf wmslib/obj-${SYSTEM_TYPE} wmslib/obj-d${SYSTEM_TYPE}
+mkdir wmslib/obj-${SYSTEM_TYPE}
+if test x"$HOME" = x/home/wms ; then
+  mkdir wmslib/obj-d${SYSTEM_TYPE}
+fi
+
+arofiles=`echo ${ofiles} | sed 's&wmslib/obj-$(SYSTEM_TYPE)/&&g'`
+cat <<EOF >>Makefile
+wmslib/libwms-\$(SYSTEM_TYPE).a:	${ofiles}
+	cd wmslib/obj-\$(SYSTEM_TYPE); ar -r libwms-\$(SYSTEM_TYPE).a ${arofiles}
+	mv wmslib/obj-\$(SYSTEM_TYPE)/libwms-\$(SYSTEM_TYPE).a wmslib/libwms-\$(SYSTEM_TYPE).a
+EOF
+if test "$RANLIB" '!=' : ; then
+  echo "	cd wmslib; ${RANLIB} libwms-\$(SYSTEM_TYPE).a" >>Makefile
+fi
+cat <<EOF >>Makefile
+
+EOF
+
+for cfile in ${cfiles}; do
+  scfile=`echo $cfile | sed 'sx.*/xx'`
+  sofile=`echo $scfile | sed 's/c$/o/'`
+  dname=`echo $cfile | sed 's&/'${scfile}'$&&'`
+  ofile=`echo $cfile | sed -e 's/src/obj-$(SYSTEM_TYPE)/' -e 'sxbut/xbut_x' -e 'sxabut/xabut_x' -e 'sxwms/xwms_x' -e 's/c$/o/'`
+  cat <<EOF >>Makefile
+${ofile}: ${cfile}
+	cd ${dname}; \$(CC) \$(CFLAGS) -c ${scfile}
+	mv ${dname}/${sofile} ${ofile}
+
+EOF
+done
+
+# I only make tar for myself.  Why?  Because nobody else really needs it
+#   and the line ends up so long it breaks some editors.
+if test x"$HOME" = x/home/wms ; then
+  tsfiles=' '
+  for sfile in ${sfiles}; do
+    tsfiles="${tsfiles} pente-\$(VERSION)/${sfile}"
+  done
+  cat <<EOF >>Makefile
+tar:
+	cd ..; tar cvf pente-\$(VERSION).tar ${tsfiles} pente-\$(VERSION)/configure.in; gzip -f -9v pente-\$(VERSION).tar
+
+EOF
+fi
+
+echo '# DO NOT DELETE' >>Makefile
+
+mv Makefile Makefile-${SYSTEM_TYPE}
+ln -s Makefile-${SYSTEM_TYPE} Makefile
+if test x"$HOME" = x/home/wms ; then
+  sed <Makefile-${SYSTEM_TYPE} >Makefile-d${SYSTEM_TYPE} -e 's/SYSTEM_TYPE = /SYSTEM_TYPE = d/' -e 's/^CFLAGS/# Old CFLAGS/' -e 's/# CFLAGS/CFLAGS/' -e 's/^LFLAGS/# Old LFLAGS/' -e 's/# LFLAGS/LFLAGS/'
+  rm -f Makefile-d
+  ln -s Makefile-d${SYSTEM_TYPE} Makefile-d
+  cd obj-d${SYSTEM_TYPE}
+  ln -s ../obj-${SYSTEM_TYPE}/configure.h .
+fi

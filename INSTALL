@@ -1,0 +1,107 @@
+README for Pente 2.2.5, 31 July 2001
+
+QUICK BUILD RULES:
+   Run "./configure", then "make", then "pente".  If all goes well, you're
+now playing the game!
+
+MORE ABOUT COMPILING:
+   To compile Pente, you need an ANSI compatible C compiler, such as gcc.  If
+you want a graphic interface, you need X11R3 or later; otherwise you will
+only be able to use the curses or text interfaces.  Pente will intelligently
+configure itself to run on the interfaces available.
+   Pente uses Gnu's "autoconfig" utility.  To build a makefile, type
+"./configure" and (hopefully) configure will do the rest.  If you have
+problems building, see the end of this document.
+   Once you have a Makefile you may want to edit the following parts:
+	prefix, bindir, mandir:
+	   These should point to the directories where the executable and
+	   the man pages should be put.  These can also be set with
+	   "configure --prefix=...", etc.
+	CC
+	   This is the C compiler that will be used.  If you want to use
+	   a different compiler than the one that "configure" wants to
+	   use, you shouldn't just change the Makefile.  Instead,
+	   set the shell environment variable "CC" to the name of your C
+	   compiler before running "configure".  If you just change the
+	   Makefile after "configure" runs, then "configure" will build
+	   configuration files for the wrong compiler.
+	CFLAGS:
+	   Set this to optimize as well as your C compiler can.  "configure"
+	   will try to guess at the best value.
+	LFLAGS:
+	   If configure doesn't add all the libraries it needs you can add
+	   them here.
+   After you have built the Makefile and (optionally) edited it, you can
+build pente by typing "make".  You can then run pente straight from
+the build area.  There will be a symbolic link, "pente", that you can
+run.  The actual binary will be called "pente-<computer name>".  For example,
+on my linux system I get "pente-i586-Linux".  This is done so that you can
+build pente for different computers on a single file system.  "pente" will
+always point to the last binary built.
+   To install pente, you must first set the bindir and mandir as
+described above, then type "make install".
+
+   Instructions on how to play pente are part of the X interface.  The man
+page contains information on running pente.
+
+   Please send bug reports, comments, etc. to William shubert, internet
+address "wms@igoweb.org", and don't forget to check out my web page at
+"http://www.igoweb.org/~wms/"!
+
+   Enjoy!
+
+LICENCE
+   This source code and all associated documentation is covered by the Gnu
+General Public Licence version 2.  You should have gotten a copy of this
+document with the source code in a file called "COPYING".  If you didn't,
+it is available from the Free Software Foundation, Inc. of Cambridge, MA or
+by anonymous FTP from prep.ai.mit.edu.  The X11 version also has the licence
+in one of the help pages.
+
+RELEASE HISTORY
+   2.2.4  Changed some text in help files and comments.
+
+   2.2.2  Last release.
+
+   2.1.7  Got a bunch of bugs out.  Ready for another post to
+	  rec.games.abstract.
+
+   2.1.0  Got network play working again!  Much nicer than before.
+	  Beta release to find bugs.
+
+   2.0.5  Added French text thanks to Eric Dupas, fixed several minor bugs
+          and several major portability bugs.
+
+   2.0.0  Major rewrite on the interface code.  Also added the "redo"
+          button, the setup window, and greatly improved the help window.
+
+   1.1.1  Fixed bug in "pente -perf" that made comparing numbers useless.
+          Announced in rec.games.go and hand-mailed to people who ask for it.
+
+   1.1.0  Bug fixes, user interface enhancements, and portability changes.
+          Fixed innumerable bugs in the user interface and the computer
+            strategy system.  No changes were made to computer strategy
+            except where it didn't do what I intended when I first wrote it.
+          Added the help window and generally tweaks up every part of the
+            user interface to look and feel as nice as possible.
+          Added use of Gnu Autonfig utility and tried system on several
+            different machines.
+
+   1.0.0  First release.  Put into alt.games.abstact FTP site.
+
+REQUEST FOR HELP
+   If this program doesn't just configure and build on your system, drop
+me a note about what went wrong and I'll try to fix it in a patch release.
+   Also, I want it to support different languages.  Currently it can run in
+English, French or Italian.  If you want to translate my strings into
+another language, great!  Get in touch with me!
+   I'd like to make the sound interface more portable; right now I only
+know how to do sound on a Sparc or a Linux machine.  If you can port it to
+other machines, by all means let me know.
+
+ACKNOWLEDGEMENTS
+   Thanks to Eric Dupas for translating the X11 strings into French and to
+Andrea Borgia for translating them into Italian.  Thanks to Yary Hluchan for
+helping to rewrite the man page.  And thanks for all the people who
+submitted bug reports or ideas for the program, who tried to compile on
+their machines, or who were willing to beta test the program!

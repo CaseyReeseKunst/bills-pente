@@ -1,0 +1,133 @@
+/*
+ * $Source: /home/wms/cvs/pente/configure.h.in,v $
+ * $Revision: 1.2 $
+ * $Date: 2001/07/29 17:08:21 $
+ *
+ * configure.h, part of Pente (game program)
+ * Copyright (C) 1994-1995 William Shubert
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ * The author can be reached at wms@igoweb.org.
+ *
+ * After being processed by "configure", this file is placed in the
+ * object directory.  This is done because a different configure.h is
+ * needed for each target architecture; the object directory seems (to me)
+ * like the natural place to keep object-dependant files, but it does
+ * tend to look a little weird to have a .h mixed in with the .o's.
+ */
+
+#ifndef  _CONFIGURE_H_
+#define  _CONFIGURE_H_  1
+
+#undef  VERSION       
+#undef  DATE          
+#undef  DATE_FRENCH   
+#undef  DATE_ITALIAN  
+
+/*
+ * Define X11_DISP to be 1 if you have X11.
+ * Also be sure that the LIBS and INCS flags in Makefile and wmslib/Makefile
+ *   are set correctly.
+ */
+#undef  X11_DISP       
+
+/*
+ * Define CURSES_DISP to be 1 if you have curses.
+ * Also be sure that the LIBS and INCS flags in Makefile and wmslib/Makefile
+ *   are set correctly.
+ * Many versions of curses require you to link with -ltermcap if curses is
+ *   to be used.
+ */
+#undef  CURSES_DISP    
+
+/*
+ * Define STDC_HEADERS to be 1 if you have the headers described in the ANSI
+ *   C standard.
+ */
+#undef  STDC_HEADERS   
+
+/*
+ * For these header macros, define them to be 1 if you have the header
+ *   described.
+ */
+#undef  HAVE_STRING_H      
+#undef  HAVE_UNISTD_H      
+#undef  HAVE_ASSERT_H      
+#undef  HAVE_STDLIB_H      
+#undef  HAVE_STRING_H      
+#undef  HAVE_SYS_SELECT_H   
+#undef  HAVE_NETINET_IN_H
+#undef  HAVE_SYS_IN_H
+#undef  HAVE_SYS_INET_H
+#undef  HAVE_RESOLV_H
+#undef  HAVE_ARPA_NAMESER_H
+#undef  HAVE_SYS_TIME_H
+
+#undef  TIME_WITH_SYS_TIME
+
+/*
+ * If you have TCP/IP sockets turn on HAVE_SOCKETS.  You need this to play
+ *   networked against another player.
+ */
+#undef  HAVE_SOCKETS
+#undef  HAVE_H_ERRNO
+
+/*
+ * RETSIGTYPE should be set to "int" or "void", whichever your particular
+ *   C compiler and OS define signal handlers to return.
+ */
+#undef  RETSIGTYPE     
+
+/*
+ * LINUX_SOUND should be set to 1 if you have linux-style sound.  Mostly
+ *   this means that you have "linux/soundcard.h".
+ */
+#undef  LINUX_SOUND    
+
+/*
+ * SUN_SOUND should be set to 1 if you have sun sparc-style sound.  Mostly
+ *   this means that you have "sun/audioio.h".
+ */
+#undef  SUN_SOUND    
+
+/*
+ * The size of various types.
+ */
+#undef  SIZEOF_SHORT
+#undef  SIZEOF_INT
+#undef  SIZEOF_LONG
+/*
+ * If your compiler doesn't have long longs, set this to zero.
+ */
+#undef  SIZEOF_LONG_LONG
+
+/*
+ * Is your machine big endian?
+ */
+#undef  WORDS_BIGENDIAN
+
+/*
+ * Do you have strerror()?
+ * If so, define this.  It will make some error messages more user friendly.
+ */
+#undef  HAVE_STRERROR
+
+/*
+ * Do you have getdtablesize()?
+ */
+#undef  HAVE_GETDTABLESIZE
+
+#endif  /* _CONFIGURE_H_ */

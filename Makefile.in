@@ -1,0 +1,85 @@
+# Makefile, part of Pente (game program)
+# Copyright (C) 1994-1995 William Shubert
+# See "configure.h.in" for more copyright information.
+
+VERSION = @VERSION@
+DATE = @DATE@
+
+# The SYSTEM_TYPE is used to figure out where to put the object files and
+#   the binary.  It's handy if you want to keep around ".o" files for,
+#   let's say, both sun3 machines and sun4 machines.
+SYSTEM_TYPE = @SYSTEM_TYPE@
+
+# NOTE: This Makefile requires the following directories be created before
+#   it can run:
+#	obj-$(SYSTEM_TYPE)
+#	obj-$(SYSTEM_TYPE)/comp
+#	obj-$(SYSTEM_TYPE)/xio
+#       wmslib/obj-$(SYSTEM_TYPE)
+# If you run "configure", these directories should be generated automatically.
+#   If, for whatever reason, this is NOT done, you should generate them by
+#   hand.
+# If you do create these by hand, make sure to copy "configure.h.in" into
+#   your top lever obj directory, rename it "configure.h", and edit it.
+#   How to edit it should be self-explanatory.
+
+# CC must be ANSI compliant.  "gcc" works well for me.
+CC = @CC@
+
+# Programs used to move the binary and the man page to the proper place.
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+
+# Change these values to tell make where to put the binary and the man page
+#   when it's done compiling.
+PREFIX = /usr/games
+BINDIR = $(PREFIX)/bin
+MANDIR = $(PREFIX)/man
+
+# This should be set to the directory containing this Makefile.
+BUILD_DIR = @BUILD_DIR@
+
+INCS = @INCDIR@
+LIBS = @LIBDIR@ -lwms-$(SYSTEM_TYPE) @LIBS@
+
+# Various CFLAGS options.  Pick what fits your compiler.
+# I try to guess what will give the best optimization, but I may be wrong.
+CFLAGS = @CFLAGS@ $(INCS)
+# CFLAGS = -ggdb -DDEBUG=1 -Wall $(INCS)
+
+LFLAGS = $(LIBS)
+# LFLAGS = $(LIBS) -static
+
+OBJS = @OBJS@
+
+pente-$(SYSTEM_TYPE): $(OBJS) wmslib/libwms-$(SYSTEM_TYPE).a
+	$(CC) -o pente-$(SYSTEM_TYPE) $(OBJS) $(LFLAGS)
+	rm -f pente
+	ln -s pente-$(SYSTEM_TYPE) pente
+
+clean:
+	rm -f $(OBJS) pente-$(SYSTEM_TYPE) wmslib/libwms-$(SYSTEM_TYPE).a wmslib/obj-$(SYSTEM_TYPE)/*.o
+
+install:	pente-$(SYSTEM_TYPE) man6/pente.6
+	$(INSTALL_PROGRAM) pente-$(SYSTEM_TYPE) $(BINDIR)/pente
+	$(INSTALL_DATA) man6/pente.6 $(MANDIR)/man6/pente.6
+
+# This depend may not work for you, but you probably won't care because you'll
+#   just build once.  If you do want to modify my source tree change this to
+#   a depend that works for your system.  Good luck.
+# This is so messy because I'm trying to do a make depend (but makedepend
+#   breaks on my system for some reason) then strip out hard-coded paths to
+#   the build directory, then remove all system includes that'll
+#   never change anyway.  Oh yeah I also have to move the .o's that the
+#   make depend emits to the proper directory.  Whew!
+depend:
+	sed -n 1,'/^# DO NOT DELETE/'p <Makefile-$(SYSTEM_TYPE) >Makefile-$(SYSTEM_TYPE)-temp
+	rm Makefile-$(SYSTEM_TYPE)
+	mv Makefile-$(SYSTEM_TYPE)-temp Makefile-$(SYSTEM_TYPE)
+	$(CC) -M $(CFLAGS) src/*.c | sed -n -e 's&$(BUILD_DIR)/&&g' -e 's& /[^ ]*&&g' -e '/o *:/s&^&obj-$$(SYSTEM_TYPE)/&' -e 's&obj-$(SYSTEM_TYPE)&obj-$$(SYSTEM_TYPE)&g' -e '/[^ \\]/p' -e '/^[ ]*$$/p' >>Makefile-$(SYSTEM_TYPE)
+	$(CC) -M $(CFLAGS) src/comp/*.c | sed -n -e 's&$(BUILD_DIR)/&&g' -e 's& /[^ ]*&&g' -e '/o *:/s&^&obj-$$(SYSTEM_TYPE)/comp/&' -e 's&obj-$(SYSTEM_TYPE)&obj-$$(SYSTEM_TYPE)&g' -e '/[^ \\]/p' -e '/^[ ]*$$/p' >>Makefile-$(SYSTEM_TYPE)
+	$(CC) -M $(CFLAGS) src/xio/*.c | sed -n -e 's&$(BUILD_DIR)/&&g' -e 's& /[^ ]*&&g' -e '/o *:/s&^&obj-$$(SYSTEM_TYPE)/xio/&' -e 's&obj-$(SYSTEM_TYPE)&obj-$$(SYSTEM_TYPE)&g' -e '/[^ \\]/p' -e '/^[ ]*$$/p' >>Makefile-$(SYSTEM_TYPE)
+	$(CC) -M $(CFLAGS) wmslib/src/*.c | sed -n -e 's&$(BUILD_DIR)/&&g' -e 's& /[^ ]*&&g' -e '/o *:/s&^&wmslib/obj-$$(SYSTEM_TYPE)/&' -e 's&obj-$(SYSTEM_TYPE)&obj-$$(SYSTEM_TYPE)&g' -e '/[^ \\]/p' -e '/^[ ]*$$/p' >>$(BUILD_DIR)/Makefile-$(SYSTEM_TYPE)
+	$(CC) -M $(CFLAGS) wmslib/src/but/*.c | sed -n -e 's&$(BUILD_DIR)/&&g' -e 's& /[^ ]*&&g' -e '/o *:/s&^&wmslib/obj-$$(SYSTEM_TYPE)/but_&' -e 's&obj-$(SYSTEM_TYPE)&obj-$$(SYSTEM_TYPE)&g' -e '/[^ \\]/p' -e '/^[ ]*$$/p' >>$(BUILD_DIR)/Makefile-$(SYSTEM_TYPE)
+	$(CC) -M $(CFLAGS) wmslib/src/abut/*.c | sed -n -e 's&$(BUILD_DIR)/&&g' -e 's& /[^ ]*&&g' -e '/o *:/s&^&wmslib/obj-$$(SYSTEM_TYPE)/abut_&' -e 's&obj-$(SYSTEM_TYPE)&obj-$$(SYSTEM_TYPE)&g' -e '/[^ \\]/p' -e '/^[ ]*$$/p' >>$(BUILD_DIR)/Makefile-$(SYSTEM_TYPE)
