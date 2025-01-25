@@ -6,4 +6,4 @@ It has a good X11 GUI interface, but it will run with a curses interface if you 
 
 Pente has multi-language support, and currently can be used in French, English, or Italian. 
 
-This is a fork of the software package currently mainiained by Debian Games at https://salsa.debian.org/games-team/pente
+This is a fork of the software package currently maintained by Debian Games at https://salsa.debian.org/games-team/pente
