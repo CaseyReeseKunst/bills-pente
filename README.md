@@ -8,4 +8,6 @@ Pente has multi-language support, and currently can be used in French, English, 
 
 Bill's Pente Program was written in C by William Shubert.
 
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+
 This is a fork of the software package currently maintained by Debian Games at https://salsa.debian.org/games-team/pente
